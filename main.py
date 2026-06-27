@@ -1,12 +1,11 @@
-import pathlib
 import json
-import datetime
+from datetime import datetime
+from pathlib import Path
 
 
 class Diary:
     def __init__(self, filename):
         self.filename = filename
-        pathlib.Path(self.filename).parent.mkdir(parents=True, exist_ok=True)
         self.entries = self.load()
 
     def load(self):
@@ -29,7 +28,7 @@ class Diary:
             current_id = self.entries[-1]['id']
         entry = {
             'id': current_id+1,
-            'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'text': text
         }
         self.entries.append(entry)
@@ -57,7 +56,7 @@ class Diary:
 
 
 if __name__ == '__main__':
-    diary = Diary('entries/diary.json')
+    diary = Diary(Path(__file__).parent / 'diary.json')
 
     while True:
         print("=== Личный дневник ===\n1. Добавить запись\n2. Показать все записи\n3. Удалить запись\n4. Выйти")
