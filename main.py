@@ -1,11 +1,11 @@
+from pathlib import Path
 import json
 from datetime import datetime
-from pathlib import Path
 
 
 class Diary:
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self):
+        self.filename = Path(__file__).parent / 'diary.json'
         self.entries = self.load()
 
     def load(self):
@@ -33,44 +33,57 @@ class Diary:
         }
         self.entries.append(entry)
         self.save()
-        print("Запись добавлена\n")
 
     def delete(self, id):
         for entry in self.entries:
             if entry['id'] == id:
                 self.entries.remove(entry)
                 self.save()
-                print("Запись удалена\n")
                 return True
-        print("Запись не найдена\n")
         return False
 
     def print_entries(self):
-        if self.entries:
-            print("Ваши записи:")
-            for entry in self.entries:
-                print(f'[{entry['id']}] {entry['date']} - {entry['text']}')
-        else:
-            print("Записи не найдены")
-        print()
+        for entry in self.entries:
+            print(f"[{entry['id']}] {entry['date']} - {entry['text']}")
+
+    def run(self):
+        while True:
+            print("=== Личный дневник ===\n1. Добавить запись\n2. Показать все записи\n3. Удалить запись\n4. Выйти")
+            choice = input("Выберите действие: ")
+            print()
+
+            match choice:
+                case '1':
+                    text = input("Введите текст записи: ")
+                    if not text.strip():
+                        print("Ошибка: текст не должен быть пустым\n")
+                        continue
+                    self.add(text)
+                    print("Запись добавлена\n")
+                case '2':
+                    if not self.entries:
+                        print("Записи не найдены\n")
+                        continue
+                    print("Ваши записи:")
+                    self.print_entries()
+                    print()
+                case '3':
+                    try:
+                        id = int(input("Введите id записи, которую хотите удалить: "))
+                        if id <= 0:
+                            print("Ошибка: число должно быть положительным\n")
+                            continue
+                        if not self.delete(id):
+                            print("Запись не найдена\n")
+                            continue
+                        print("Запись удалена\n")
+                    except ValueError:
+                        print("Ошибка: введите число\n")
+                case '4':
+                    print("Завершение работы")
+                    break
 
 
 if __name__ == '__main__':
-    diary = Diary(Path(__file__).parent / 'diary.json')
-
-    while True:
-        print("=== Личный дневник ===\n1. Добавить запись\n2. Показать все записи\n3. Удалить запись\n4. Выйти")
-        choice = input("Выберите действие: ")
-        print()
-
-        match choice:
-            case '1':
-                text = input("Введите текст записи: ")
-                diary.add(text)
-            case '2':
-                diary.print_entries()
-            case '3':
-                id = int(input("Введите id записи, которую хотите удалить: "))
-                diary.delete(id)
-            case '4':
-                break
+    diary = Diary()
+    diary.run()
